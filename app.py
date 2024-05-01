@@ -25,19 +25,22 @@ def get_tags_for_ip(ip_address):
     return tags
 
 def generate_html_table(key, tags):
-    
-    html_table = "<table border='1'>\n" # begin table building
-    html_table += "<tr><th>Klucz</th><th>Tagi</th></tr>\n"  # add header
-    html_table += f"<tr><td>{key}</td>" # add key in the first column
-    html_table += "<td>"    # beign second column for tags
+    html_table = "<table border='1'>\n"  # Rozpoczęcie budowania tabeli HTML
+    html_table += "<tr><th>Klucz</th><th>Tagi</th></tr>\n"  # Dodanie nagłówków
 
-    for tag in tags:    # add tags to the table
-        html_table += f"<p>{tag}</p>"
+    html_table += f"<tr><td>{key}</td>"  # Dodanie klucza w pierwszej kolumnie
+    html_table += "<td>"  # Rozpoczęcie drugiej kolumny dla tagów
 
-    html_table += "</td></tr>\n"    # end second column 
-    html_table += "</table>"    # end table building
-    
+    for idx, tag in enumerate(tags):
+        if idx > 0:
+            html_table += "<hr>"  # Dodanie linii poziomej przed każdym tagiem (jeśli nie jest to pierwszy tag)
+        html_table += f"<p>{tag}</p>"  # Dodanie tagu w nowym wierszu
+
+    html_table += "</td></tr>\n"  # Zamknięcie drugiej kolumny i wiersza
+    html_table += "</table>"  # Zakończenie tabeli HTML
+
     return html_table
+
 
 @app.route('/ip-tags/<ip>', methods=['GET'])
 def ip_tags(ip):
