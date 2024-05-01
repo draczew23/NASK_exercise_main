@@ -24,9 +24,30 @@ def get_tags_for_ip(ip_address):
     tags.sort()
     return tags
 
+def generate_html_table(key, tags):
+    
+    html_table = "<table border='1'>\n" # begin table building
+    html_table += "<tr><th>Klucz</th><th>Tagi</th></tr>\n"  # add header
+    html_table += f"<tr><td>{key}</td>" # add key in the first column
+    html_table += "<td>"    # beign second column for tags
+
+    for tag in tags:    # add tags to the table
+        html_table += f"<p>{tag}</p>"
+
+    html_table += "</td></tr>\n"    # end second column 
+    html_table += "</table>"    # end table building
+    
+    return html_table
+
 @app.route('/ip-tags/<ip>', methods=['GET'])
 def ip_tags(ip):
     tags = get_tags_for_ip(ip)
     return jsonify(tags), 200
+
+@app.route('/ip-tags-report/<ip>', methods=['GET'])
+def ip_tags_report(ip):
+    tags = get_tags_for_ip(ip)
+    key = ip
+    return generate_html_table(key, tags), 200
 
 f.close()
