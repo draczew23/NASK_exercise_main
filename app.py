@@ -1,17 +1,10 @@
-from flask import Flask, request
+from flask import Flask, jsonify
 import ipaddress
 import json
 
-IP_TAGS_DATABASE = [
-    {"tag": "foo", "ip_network": "192.0.2.0/24"},
-    {"tag": "just a TAG", "ip_network": "198.51.100.0/24"},
-    {"tag": "{$(a-tag)$}", "ip_network": "198.51.100.0/24"},
-    {"tag": "zażółć ♥", "ip_network": "198.51.100.0/24"},
-    {"tag": "foo", "ip_network": "192.0.2.0/24"},
-    {"tag": "bar", "ip_network": "192.0.2.8/29"},
-    {"tag": "bar", "ip_network": "10.20.0.0/16"},
-    {"tag": "SPAM", "ip_network": "10.20.30.40/32"},
-]
+# Opening our database from JSON file
+f = open('ip_base.json')
+IP_TAGS_DATABASE = json.load(f)
 
 app = Flask(__name__)
 
@@ -31,8 +24,9 @@ def get_tags_for_ip(ip_address):
     tags.sort()
     return tags
 
-@app.route('/ip-tags')
-def ip_tags():
-    ip_address = request.args.get('ip')
-    tags = get_tags_for_ip(ip_address)
-    return tags, 200
+@app.route('/ip-tags/<ip>', methods=['GET'])
+def ip_tags(ip):
+    tags = get_tags_for_ip(ip)
+    return jsonify(tags), 200
+
+f.close()
