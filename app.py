@@ -107,5 +107,19 @@ def ip_tags_report(ip):
         app.logger.error(f"An unexpected error occurred: {str(e)}")
         return jsonify({'error': 'Internal server error', 'message': 'An unexpected error occurred.'}), 500
 
+@app.errorhandler(404)
+def not_found_error(error):
+    """
+    Handle 404 errors.
+
+    Args:
+        error: The error object.
+
+    Returns:
+        Response: A JSON response with a 404 error message.
+    """
+    app.logger.error(f"Resource not found: {error}")
+    return jsonify({'error': 'Not found', 'message': 'Requested resource not found.'}), 404
+
 if __name__ == '__main__':
     app.run()
