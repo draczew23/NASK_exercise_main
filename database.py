@@ -17,7 +17,7 @@ class Database:
         >>> db = Database('ip_tags_data.json')
         >>> tags = db.get_tags_for_ip('192.168.1.1')
     """
-    def __init__(self, filename):
+    def __init__(self, filename, logger=None):
         """
         Initialize a Database instance.
 
@@ -25,14 +25,24 @@ class Database:
             filename (str): The path to the JSON file containing IP tags data.
         """
         self.filename = filename
+        self.logger = logger
         self.load_database()
-
+        
     def load_database(self):
         """
         Load the IP tags database from the specified JSON file.
         """
-        with open(self.filename, encoding="utf-8") as f:
-            self.ip_tags_database = json.load(f)
+        try:
+            with open(self.filename, encoding="utf-8") as f:
+                self.logger.info(f"Loading database from file: {self.filename}")
+                self.ip_tags_database = json.load(f)
+                # self.logger.info("Database loaded successfully.")
+        except FileNotFoundError as e:
+            self.logger.critical(f"Error loading database: {str(e)}")
+            raise FileNotFoundError(f"Error loading database: {str(e)}") from e
+        except json.JSONDecodeError as e:
+            self.logger.critical(f"Error decoding JSON data: {str(e)}")
+            raise ValueError(f"Error decoding JSON data: {str(e)}") from e
 
     def get_tags_for_ip(self, ip_address):
         """
@@ -45,6 +55,7 @@ class Database:
             list: A sorted list of unique tags associated with the IP address. If no tags
                 are found for the IP address, an empty list is returned.
         """
+
         ip_address_conv = ipaddress.ip_address(ip_address)
         tags = []
 

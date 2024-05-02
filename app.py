@@ -4,7 +4,6 @@ from flask import Flask, jsonify
 from database import Database
 
 app = Flask(__name__)
-db = Database('ip_base.json')
 
 # Logger configuration settings
 log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
@@ -12,6 +11,8 @@ log_handler = RotatingFileHandler('app.log', maxBytes=1000000, backupCount=1)
 log_handler.setFormatter(log_formatter)
 app.logger.addHandler(log_handler)
 app.logger.setLevel(logging.INFO)
+
+db = Database('ip_base.json', logger=app.logger)
 
 @app.route('/ip-tags/', methods=['GET'])
 def missing_ip_error():
@@ -105,4 +106,4 @@ def ip_tags_report(ip):
         return jsonify({'error': 'Internal server error', 'message': 'An unexpected error occurred.'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
