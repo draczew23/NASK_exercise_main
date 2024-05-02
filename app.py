@@ -1,11 +1,29 @@
-import ipaddress
+import logging
+from logging.handlers import RotatingFileHandler
 from flask import Flask, jsonify
 from database import Database
 
-# Opening our database from JSON file
-db = Database('ip_base.json')
-# App initialization
 app = Flask(__name__)
+db = Database('ip_base.json')
+
+# Logger configuration settings
+log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+log_handler = RotatingFileHandler('app.log', maxBytes=1000000, backupCount=1)
+log_handler.setFormatter(log_formatter)
+app.logger.addHandler(log_handler)
+app.logger.setLevel(logging.INFO)
+
+@app.route('/ip-tags/', methods=['GET'])
+def missing_ip_error():
+    """
+    Handle error when IP address is missing in /ip-tags/ request.
+
+    Returns:
+        Response: A JSON response with error details and HTTP status code 400.
+    """
+    error_message = 'IP address is missing. Please provide a valid IP address.'
+    app.logger.error(error_message)
+    return jsonify({'error': 'Bad request', 'message': error_message}), 400
 
 def generate_html_table(key, tags):
     """
@@ -35,38 +53,30 @@ def generate_html_table(key, tags):
 
     return html_table
 
-class InvalidIPAddress(Exception):
-    pass
-
-@app.errorhandler(InvalidIPAddress)
-def handle_invalid_ip_address(error):
-    response = jsonify({'error': 'Invalid IP address format'})
-    response.status_code = 400
-    return response
-
 
 @app.route('/ip-tags/<ip>', methods=['GET'])
 def ip_tags(ip):
     """
-    Retrieve and return tags associated with the specified IP address.
+    Retrieve tags associated with the specified IP address.
 
     Args:
-        ip (str): The IP address for which tags are to be retrieved.
+        ip (str): The IP address to retrieve tags for.
 
     Returns:
-        Response: A JSON response containing a list of tags associated with the IP address.
-                  The response status code is 200 (OK) on success.
-
-    Example:
-        >>> # Sending a GET request to '/ip-tags/192.168.1.1' will return a JSON response with tags.
+        Response: JSON response containing the tags associated with the IP address.
+                  Status code 200 on success, or appropriate error response on failure.
     """
+    if not ip:
+        return missing_ip_error()
     try:
-        ipaddress.ip_address(ip)
+        tags = db.get_tags_for_ip(ip)
+        return jsonify(tags), 200
     except ValueError as e:
-        raise InvalidIPAddress from e
-    
-    tags = db.get_tags_for_ip(ip)
-    return jsonify(tags), 200
+        app.logger.error(f"Invalid IP address '{ip}': {str(e)}")
+        return jsonify({'error': 'Bad request', 'message': 'Invalid IPv4 address format.'}), 400
+    except Exception as e:
+        app.logger.error(f"An unexpected error occurred: {str(e)}")
+        return jsonify({'error': 'Internal server error', 'message': 'An unexpected error occurred.'}), 500
 
 @app.route('/ip-tags-report/<ip>', methods=['GET'])
 def ip_tags_report(ip):
@@ -74,18 +84,25 @@ def ip_tags_report(ip):
     Generate an HTML report containing tags associated with the specified IP address.
 
     Args:
-        ip (str): The IP address for which tags are to be included in the HTML report.
+        ip (str): The IP address to generate the report for.
 
     Returns:
-        Response: An HTML response containing a table with the specified IP address as the key
-                  and associated tags in separate rows. The response status code is 200 (OK) on success.
-
-    Example:
-        >>> # Sending a GET request to '/ip-tags-report/192.168.1.1' will return an HTML report.
+        str: HTML content representing a report table of tags associated with the IP address.
+             Status code 200 on success, or appropriate error response on failure.
     """
-    tags = db.get_tags_for_ip(ip)
-    key = ip
-    return generate_html_table(key, tags), 200
+    if not ip:
+        return missing_ip_error()
+    try:
+        tags = db.get_tags_for_ip(ip)
+        key = ip
+        html_table = generate_html_table(key, tags)
+        return html_table, 200
+    except ValueError as e:
+        app.logger.error(f"Invalid IP address '{ip}': {str(e)}")
+        return jsonify({'error': 'Bad request', 'message': 'Invalid IPv4 address format.'}), 400
+    except Exception as e:
+        app.logger.error(f"An unexpected error occurred: {str(e)}")
+        return jsonify({'error': 'Internal server error', 'message': 'An unexpected error occurred.'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
