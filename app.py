@@ -1,44 +1,11 @@
 import ipaddress
-import json
 from flask import Flask, jsonify
+from database import Database
 
 # Opening our database from JSON file
-f = open('ip_base.json',  encoding="utf-8")
-IP_TAGS_DATABASE = json.load(f)
-
+db = Database('ip_base.json')
+# App initialization
 app = Flask(__name__)
-
-def get_tags_for_ip(ip_address):
-    """
-    Retrieves tags associated with a given IP address from a predefined IP tags database.
-
-    Args:
-        ip_address (str): The IP address for which tags are to be retrieved.
-
-    Returns:
-        list: A sorted list of unique tags associated with the IP address. If no tags
-              are found for the IP address, an empty list is returned.
-    """
-    ip_address_conv = ipaddress.ip_address(ip_address)
-    tags = []
-
-    # Loop through entries in the IP_TAGS_DATABASE
-    for entry in IP_TAGS_DATABASE:
-        try:
-            network = ipaddress.ip_network(entry['ip_network'])
-            # Check if the IP address is within the defined network
-            if ip_address_conv in network:
-                # Check if the tag associated with the network entry is already in the list
-                if entry['tag'] in tags:
-                    continue  # Skip if the tag is already added
-
-                tags.append(entry['tag'])  # Add the tag to the list
-        except ValueError:
-            continue  # Skip this entry if there's an invalid network format
-
-    tags.sort()  # Sort the list of tags lexicographically
-    return tags
-
 
 def generate_html_table(key, tags):
     """
@@ -68,6 +35,15 @@ def generate_html_table(key, tags):
 
     return html_table
 
+class InvalidIPAddress(Exception):
+    pass
+
+@app.errorhandler(InvalidIPAddress)
+def handle_invalid_ip_address(error):
+    response = jsonify({'error': 'Invalid IP address format'})
+    response.status_code = 400
+    return response
+
 
 @app.route('/ip-tags/<ip>', methods=['GET'])
 def ip_tags(ip):
@@ -84,7 +60,12 @@ def ip_tags(ip):
     Example:
         >>> # Sending a GET request to '/ip-tags/192.168.1.1' will return a JSON response with tags.
     """
-    tags = get_tags_for_ip(ip)
+    try:
+        ipaddress.ip_address(ip)
+    except ValueError as e:
+        raise InvalidIPAddress from e
+    
+    tags = db.get_tags_for_ip(ip)
     return jsonify(tags), 200
 
 @app.route('/ip-tags-report/<ip>', methods=['GET'])
@@ -102,8 +83,9 @@ def ip_tags_report(ip):
     Example:
         >>> # Sending a GET request to '/ip-tags-report/192.168.1.1' will return an HTML report.
     """
-    tags = get_tags_for_ip(ip)
+    tags = db.get_tags_for_ip(ip)
     key = ip
     return generate_html_table(key, tags), 200
 
-f.close()
+if __name__ == '__main__':
+    app.run(debug=True)
