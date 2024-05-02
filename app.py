@@ -71,6 +71,7 @@ def ip_tags(ip):
         return missing_ip_error()
     try:
         tags = db.get_tags_for_ip(ip)
+        app.logger.info(f"Tags for the IP address '{ip}': were successfully retrieved.")
         return jsonify(tags), 200
     except ValueError as e:
         app.logger.error(f"Invalid IP address '{ip}': {str(e)}")
@@ -97,6 +98,7 @@ def ip_tags_report(ip):
         tags = db.get_tags_for_ip(ip)
         key = ip
         html_table = generate_html_table(key, tags)
+        app.logger.info(f"Report for the IP address '{ip}': has been succesfully prepeared.")
         return html_table, 200
     except ValueError as e:
         app.logger.error(f"Invalid IP address '{ip}': {str(e)}")

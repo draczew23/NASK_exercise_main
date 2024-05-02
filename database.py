@@ -34,9 +34,7 @@ class Database:
         """
         try:
             with open(self.filename, encoding="utf-8") as f:
-                self.logger.info(f"Loading database from file: {self.filename}")
                 self.ip_tags_database = json.load(f)
-                # self.logger.info("Database loaded successfully.")
         except FileNotFoundError as e:
             self.logger.critical(f"Error loading database: {str(e)}")
             raise FileNotFoundError(f"Error loading database: {str(e)}") from e
@@ -69,4 +67,5 @@ class Database:
                 continue
 
         tags.sort()
+        self.logger.info("Managed to successfully read the data from the database and acquire tags")
         return tags
