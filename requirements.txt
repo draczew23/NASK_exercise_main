@@ -1,5 +1,3 @@
 flask
 gunicorn
 ipaddress
-json
-request
