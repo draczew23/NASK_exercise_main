@@ -12,7 +12,7 @@ The IP Tagging Service allows clients to query two endpoints:
   - Generates an HTML table report presenting tags associated with the provided IPv4 address.
   - Tags are displayed in individual cells within the table for readability.
 
-A simple base of ip address is provided to interact with the IP Tagging Service. This base is stored in the **ip_base.json** file. Interaction with the database is conducted through the **database.py** file.
+A simple base of ip address is provided to interact with the IP Tagging Service. This base is stored in the **ip_base.json** file which is placed in the `NASK_exercise_main` directory. Interaction with the database is conducted through the **database.py** file.
 
 ## Usage
 
@@ -62,10 +62,16 @@ To run tests, run the following command
   docker-compose run my_app python check_app.py
 ```
 
-There are four simple unit tests implemented. 
+There are four simple unit tests implemented. Those tests check:
+- if invalid IPv4 address was provided in the first endpoint and if the error code is 400.
+- if correct IPv4 address was provided in the first endpoint and if the results for particular IP address and the status code are correct.
+- if the report has a form of an HTML table and if the status code is correct.
+- if invalid IPv4 address was provided in the second endpoint and if the correct error message is generated.
+
 #### TO DO:
 - missing database test 
 - unexpected errors tests for both endpoints
+- efficiency tests
 ## Author
 
 Jakub Wiechnik

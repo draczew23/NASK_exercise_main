@@ -30,5 +30,81 @@
     {
         "tag": "SPAM",
         "ip_network": "10.20.30.40/32"
+    },
+    {
+        "tag": " zestaw: ☺☻♥♦",
+        "ip_network": "10.20.30.40/32"
+    },
+    {
+        "tag": "Don't Start now",
+        "ip_network": "10.20.30.40/32"
+    },
+    {
+        "tag": "Tutaj jest tag",
+        "ip_network": "10.20.30.40/32"
+    },
+    {
+        "tag": "anten1sdf ",
+        "ip_network": "10.4.0.12/31"
+    },
+    {
+        "tag": "Ortodoksja",
+        "ip_network": "10.4.0.12/31"
+    },
+    {
+        "tag": "Asus19-292",
+        "ip_network": "10.4.0.8/30"
+    },
+    {
+        "tag": "Warszawa",
+        "ip_network": "10.4.0.0/29"
+    },
+    {
+        "tag": "źć√ļńĶąśń",
+        "ip_network": "10.3.0.12/31"
+    },
+    {
+        "tag": "PastaallaGricia",
+        "ip_network": "192.0.2.0/24"
+    },
+    {
+        "tag": "Amatriciana",
+        "ip_network": "192.0.2.8/29"
+    },
+    {
+        "tag": "Carbonara",
+        "ip_network": "10.4.0.0/14"
+    },
+    {
+        "tag": "ParmigReggiano",
+        "ip_network": "10.32.0.0/11"
+    },
+    {
+        "tag": "Modanasuknie:19",
+        "ip_network": "11.0.0.0/28"
+    },
+    {
+        "tag": "Hiperbola",
+        "ip_network": "10.20.30.40/32"
+    },
+    {
+        "tag": "lajkon^^ik",
+        "ip_network": "64.0.0.0/2"
+    },
+    {
+        "tag": "Palim11spets ",
+        "ip_network": "190.0.0.0/24"
+    },
+    {
+        "tag": "Bu$raC~ysko",
+        "ip_network": "10.128.0.0/9"
+    },
+    {
+        "tag": "pietruszeczka",
+        "ip_network": "10.4.0.0/14"
+    },
+    {
+        "tag": "Koślawy-zgajnikk",
+        "ip_network": "10.2.0.0/15"
     }
 ]
